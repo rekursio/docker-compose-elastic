@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+    # Elasticsearch container
+    elasticsearch:
+        image: elasticsearch:7.9.2
+        environment: 
+            - discovery.type=single-node
+        networks:
+            - elastic
+    
+    # Kibana container
+    kibana:
+        image: kibana:7.9.2
+        ports:
+            - 5601:5601
+        networks:
+            - elastic
+        depends_on:
+            - elasticsearch
+
+    # Logstash container
+    logstash:
+        image: logstash:7.9.2
+        environment:
+            - path.config=/usr/share/logstash/logstash-config/logstash.conf
+        volumes:
+            - ./logstash-config/:/usr/share/logstash/logstash-config/
+        ports:
+            - 1514:1514
+        networks:
+            - elastic
+        depends_on:
+            - elasticsearch
+networks:
+    elastic:
